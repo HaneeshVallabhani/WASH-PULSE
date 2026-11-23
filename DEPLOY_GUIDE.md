@@ -1,30 +1,26 @@
 # Deploy WashPulse to Netlify
 
-This is a static HTML site and does not need a build command.
+WashPulse is a static HTML site. Netlify does not need to run a build command; the root `netlify.toml` already sets `publish = "."`.
 
-## First deploy
+## Connect GitHub once
 
-1. Sign in to Netlify.
-2. Open <https://app.netlify.com/drop>.
-3. Drag the folder containing `index.html` and `netlify.toml` onto the page.
-4. Netlify publishes the site and gives you a URL.
+1. Sign in to Netlify: <https://app.netlify.com/>
+2. From your team dashboard, choose **Add new project → Import an existing project**.
+3. Select **GitHub** and authorize Netlify when prompted.
+4. Choose repository **HaneeshVallabhani/Haneesh_3579**.
+5. Keep the production branch as `main`. Confirm the publish directory is `.` and the build command is blank (the checked-in `netlify.toml` sets these values).
+6. Select **Deploy** / **Publish**.
 
-## Automatic deploys from GitHub
+Netlify will create the site and deploy it. After this one-time connection, each push to `main` automatically triggers a new deployment. You do not need a Netlify API token or GitHub Actions secrets for this native integration.
 
-The included `.github/workflows/netlify-deploy.yml` runs on every push to `main` and can also be started manually from GitHub Actions.
+## Updating the site
 
-1. Create/claim the Netlify site from the first-deploy step.
-2. In Netlify, open **Site configuration → General → Site details** and copy the **Site ID**.
-3. In Netlify, open **User settings → Applications → Personal access tokens** and create a token. Keep it private.
-4. In GitHub, open **Settings → Secrets and variables → Actions → New repository secret**. Add `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID`.
-5. Push to `main`, or open **Actions → Deploy WashPulse to Netlify → Run workflow**.
-
-Never put the Netlify token in `index.html`, commit it to the repository, or share it in chat.
+Commit or push changed files to the repository's `main` branch. Netlify automatically builds and publishes the update. Check the site's **Deploys** page to see deployment status and the live URL.
 
 ## Current demo limitations
 
-- Student and staff records live in browser `localStorage` and `BroadcastChannel`; different devices do not share data.
-- `SMS_API_ENDPOINT` is empty. The current OTP UI does not send a real SMS or validate a server-issued OTP; any four digits pass the front-end check.
-- The displayed QR graphic is a visual placeholder, not a standards-compliant camera-scannable QR code. The staff screen accepts typed student or bag IDs.
+- Student and staff records are saved in browser `localStorage` and synchronized with `BroadcastChannel` only within the same browser context. Different devices do not share data.
+- `SMS_API_ENDPOINT` is empty. The current OTP screen does not send a real SMS or validate a server-issued OTP; any four digits pass the front-end check.
+- The generated QR graphic is a visual placeholder, not a standards-compliant camera-scannable QR code. The staff screen currently accepts typed student or bag IDs.
 
-Netlify hosting makes the static demo publicly reachable; it does not add backend storage, SMS delivery, secure authentication, or cross-device synchronization. Those require backend and service integration.
+Netlify hosting makes the static demo publicly reachable; it does not add backend storage, real SMS delivery, secure authentication, or cross-device synchronization. Those require a backend and service integration.
