@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WashPulse — Verified Student &amp; Staff QR Laundry System</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen overflow-x-hidden">
+  <div class="max-w-6xl mx-auto px-4 py-5 pb-20">
+    <!-- Top Ecosystem Header -->
+    <header class="rounded-2xl bg-slate-900/90 border border-slate-800 p-4 mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-400 to-emerald-600 text-slate-950 flex items-center justify-center font-extrabold text-lg shadow-lg">
+          WP
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-lg font-extrabold tracking-tight text-white">WashPulse</h1>
+            <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">9 AM – 7 PM</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">Unique Per-Student QR Pass + Dedicated Laundry Staff Scanner</p>
+        </div>
+      </div>
+
+      <!-- Separate App Switcher (3-col mobile grid, inline on laptop) -->
+      <div class="grid grid-cols-3 sm:flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 w-full md:w-auto">
+        <button id="mode-student" type="button" class="mode-btn px-2 sm:px-3.5 py-2 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-teal-500 text-slate-950 transition text-center">Student</button>
+        <button id="mode-staff" type="button" class="mode-btn px-2 sm:px-3.5 py-2 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-400 hover:text-white transition text-center">Staff</button>
+        <button id="mode-split" type="button" class="mode-btn px-2 sm:px-3.5 py-2 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold text-slate-400 hover:text-white transition text-center">Split Demo</button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div id="apps-container" class="max-w-xl mx-auto">
+
+      <!-- ========================================================= -->
+      <!-- APP 1: STUDENT APP (Self-Registration + 10-Digit OTP)     -->
+      <!-- ========================================================= -->
+      <section id="panel-student" class="rounded-3xl bg-slate-900 border border-slate-800 overflow-hidden shadow-2xl">
+        <div class="bg-gradient-to-r from-teal-600 to-emerald-600 px-5 py-4 flex items-center justify-between gap-2">
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-teal-100">Student Portal</p>
+            <h2 id="student-header-title" class="text-base font-extrabold text-white">Verify Your Student Pass</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="student-room-badge" class="hidden px-2.5 py-1 rounded-full bg-white/15 text-white text-xs font-semibold"></span>
+            <button id="btn-student-logout" type="button" class="hidden px-2.5 py-1 rounded-lg bg-slate-950/30 hover:bg-slate-950/50 text-white text-[11px] font-semibold transition">Switch User</button>
+          </div>
+        </div>
+
+        <!-- STEP A: Student Self-Onboarding & 10-Digit Mobile OTP -->
+        <div id="student-auth-view" class="p-5 space-y-4">
+          <div class="rounded-2xl bg-slate-950 border border-slate-800 p-4 space-y-3">
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Enter your own hostel details and 10-digit mobile number. Each verified student receives a <strong>unique QR pass</strong>.
+            </p>
+
+            <form id="student-onboard-form" class="space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="inp-name" class="block text-[11px] font-semibold text-slate-400 mb-1">Full Name</label>
+                  <input id="inp-name" type="text" placeholder="e.g., Ananya Sharma" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500" required />
+                </div>
+                <div>
+                  <label for="inp-regid" class="block text-[11px] font-semibold text-slate-400 mb-1">Student ID / Reg No.</label>
+                  <input id="inp-regid" type="text" placeholder="e.g., 12204891" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500" required />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="inp-hostel" class="block text-[11px] font-semibold text-slate-400 mb-1">Hostel / Block Name</label>
+                  <input id="inp-hostel" type="text" placeholder="e.g., BH-4 or GH-2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500" required />
+                </div>
+                <div>
+                  <label for="inp-room" class="block text-[11px] font-semibold text-slate-400 mb-1">Room Number</label>
+                  <input id="inp-room" type="text" placeholder="e.g., 312-B" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500" required />
+                </div>
+              </div>
+
+              <div>
+                <label for="inp-contact" class="block text-[11px] font-semibold text-slate-400 mb-1">10-Digit Mobile Number</label>
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <div class="flex gap-2 flex-1">
+                    <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 sm:py-2 text-xs text-slate-400 font-semibold shrink-0">+91</div>
+                    <input id="inp-contact" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" placeholder="10-digit mobile number" class="w-full flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 sm:py-2 text-xs text-white placeholder-slate-500 tracking-wider focus:outline-none focus:ring-2 focus:ring-teal-500" required />
+                  </div>
+                  <button id="btn-send-otp" type="submit" class="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-extrabold transition shrink-0">
+                    Send OTP
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- OTP Verification Box (No OTP displayed on screen) -->
+            <div id="otp-verify-box" class="hidden pt-3 border-t border-slate-800 space-y-2.5">
+              <p id="otp-sent-status" class="text-xs text-teal-300 font-medium"></p>
+              <div class="flex gap-2">
+                <input id="inp-otp" type="text" inputmode="numeric" maxlength="4" placeholder="Enter 4-digit SMS OTP" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white tracking-widest font-bold focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                <button id="btn-verify-otp" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold transition">
+                  Verify &amp; Enter
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Saved Verified Students Switcher -->
+          <div id="saved-students-wrap" class="hidden rounded-2xl bg-slate-950 border border-slate-800 p-4">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Verified Students on This Session</p>
+            <div id="saved-students-list" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+
+        <!-- STEP B: Verified Student Dashboard -->
+        <div id="student-dash-view" class="hidden p-5 space-y-5">
+          <!-- Unique Dynamic QR Pass -->
+          <div class="rounded-2xl bg-slate-950 border border-slate-800 p-4 flex flex-col sm:flex-row items-center gap-4">
+            <div id="student-qr-container" class="bg-white p-2.5 rounded-xl shrink-0 shadow-md" aria-label="Unique Student Laundry QR Code"></div>
+            <div class="flex-1 w-full">
+              <div class="flex items-center justify-between gap-2">
+                <p id="dash-student-name" class="text-sm font-extrabold text-white"></p>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">OTP Verified ✓</span>
+              </div>
+              <p id="dash-student-meta" class="text-xs text-slate-400 mt-0.5"></p>
+
+              <div class="mt-3">
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-400">Weekly Quota Used</span>
+                  <span id="quota-text" class="font-bold text-teal-300">0 / 24 clothes</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                  <div id="quota-bar" class="h-full bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Bag Live Tracker -->
+          <div id="student-tracker-card" class="rounded-2xl bg-slate-950 border border-slate-800 p-4">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <p id="student-bag-id" class="text-xs font-bold text-white">No Active Bag Yet</p>
+                <p id="student-slot-label" class="text-[11px] text-slate-400 mt-0.5">Add your clothes below to generate a drop-off token.</p>
+              </div>
+              <span id="student-status-pill" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300">Idle</span>
+            </div>
+            <div id="student-timeline" class="grid grid-cols-5 gap-1.5 text-center mt-3"></div>
+          </div>
+
+          <!-- Pack Bag (Variable +/- Quantities) & AI Care Guard -->
+          <div class="rounded-2xl bg-slate-950 border border-slate-800 p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Pack Bag &amp; AI Care Guard</h3>
+              <span id="bag-total-count" class="text-[11px] font-bold text-teal-300">0 clothes selected</span>
+            </div>
+
+            <div id="bag-builder-items" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+
+            <div id="ai-care-alert" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
+              Use + / - to add your clothes and run an AI care check before drop-off.
+            </div>
+
+            <!-- Laundry Hours Strictly 9:00 AM to 7:00 PM -->
+            <div class="flex flex-col sm:flex-row gap-2 pt-1">
+              <select id="slot-select" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option value="9:00 AM – 11:00 AM (Morning · Low Crowd)">9:00 AM – 11:00 AM (Morning · Low Crowd)</option>
+                <option value="11:00 AM – 1:30 PM (Midday · Low Crowd)">11:00 AM – 1:30 PM (Midday · Low Crowd)</option>
+                <option value="2:00 PM – 4:30 PM (Afternoon · Moderate)">2:00 PM – 4:30 PM (Afternoon · Moderate)</option>
+                <option value="4:30 PM – 7:00 PM (Evening · Peak)">4:30 PM – 7:00 PM (Evening · Peak)</option>
+              </select>
+              <button id="btn-submit-bag" type="button" class="px-4 py-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-extrabold transition shadow-md">
+                Create Bag &amp; QR
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- APP 2: LAUNDRY STAFF APP (Separate Staff Login + Scanner) -->
+      <!-- ========================================================= -->
+      <section id="panel-staff" class="hidden rounded-3xl bg-slate-900 border border-slate-800 overflow-hidden shadow-2xl">
+        <div class="bg-gradient-to-r from-orange-600 to-amber-600 px-5 py-4 flex items-center justify-between gap-2">
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-orange-100">Attendant Portal · StaffScan</p>
+            <h2 id="staff-header-title" class="text-base font-extrabold text-white">Staff Counter Sign-In</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="staff-counter-badge" class="hidden px-2.5 py-1 rounded-full bg-white/15 text-white text-xs font-semibold"></span>
+            <button id="btn-staff-logout" type="button" class="hidden px-2.5 py-1 rounded-lg bg-slate-950/30 hover:bg-slate-950/50 text-white text-[11px] font-semibold transition">Lock</button>
+          </div>
+        </div>
+
+        <!-- Staff Login Screen -->
+        <div id="staff-auth-view" class="p-5">
+          <form id="staff-login-form" class="rounded-2xl bg-slate-950 border border-slate-800 p-4 space-y-3">
+            <p class="text-xs text-slate-300">Separate staff-only terminal (9:00 AM – 7:00 PM counter hours). Sign in to scan student QR passes.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="staff-name-inp" class="block text-[11px] font-semibold text-slate-400 mb-1">Attendant Name</label>
+                <input id="staff-name-inp" type="text" placeholder="e.g., Ramesh Kumar" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500" required />
+              </div>
+              <div>
+                <label for="staff-counter-inp" class="block text-[11px] font-semibold text-slate-400 mb-1">Hostel Block</label>
+                <input id="staff-counter-inp" type="text" placeholder="e.g., BH-4" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500" required />
+              </div>
+            </div>
+            <div>
+              <label for="staff-pin-inp" class="block text-[11px] font-semibold text-slate-400 mb-1">4-Digit Staff PIN</label>
+              <div class="flex gap-2">
+                <input id="staff-pin-inp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white tracking-widest focus:outline-none focus:ring-2 focus:ring-orange-500" required />
+                <button type="submit" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-slate-950 text-xs font-extrabold transition">
+                  Unlock Scanner
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Staff Dashboard -->
+        <div id="staff-dash-view" class="hidden p-5 space-y-5">
+          <!-- QR Scanner Box -->
+          <div class="rounded-2xl bg-slate-950 border border-slate-800 p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-orange-300">Scan Student QR or Bag Token</h3>
+              <span class="text-[11px] text-slate-400">9 AM – 7 PM</span>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="staff-scan-input" type="text" placeholder="Enter Student ID or Bag ID (e.g., 12204891 or BAG-...)" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              <button id="btn-staff-lookup-scan" type="button" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-slate-950 text-xs font-extrabold transition shrink-0">
+                📷 Scan &amp; Verify
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Bags Queue -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Incoming &amp; Active Hostel Bags</h3>
+              <span id="staff-queue-count" class="text-xs font-semibold text-slate-400">0 bags</span>
+            </div>
+            <div id="staff-bag-list" class="space-y-3"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- MODAL: Staff QR Verification -->
+  <div id="modal-staff-scan" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-orange-400">QR Verified at Counter</span>
+        <span id="modal-bag-badge" class="text-xs font-bold text-white bg-slate-800 px-2.5 py-0.5 rounded-full"></span>
+      </div>
+      <h3 class="text-base font-extrabold text-white mt-2">Confirm Student Bag</h3>
+      <p id="modal-student-info" class="text-xs text-slate-400 mt-0.5"></p>
+
+      <div class="mt-4 bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-400">Student Declared Count</span>
+          <span id="modal-declared-count" class="font-bold text-white"></span>
+        </div>
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-slate-400">Staff Verified Count</span>
+          <div class="flex items-center gap-2">
+            <button id="btn-count-minus" type="button" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold">-</button>
+            <span id="modal-verified-count" class="font-extrabold text-teal-300 w-5 text-center">0</span>
+            <button id="btn-count-plus" type="button" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold">+</button>
+          </div>
+        </div>
+        <div id="modal-care-note" class="hidden text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2 mt-2"></div>
+      </div>
+
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="btn-close-scan" type="button" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800">Cancel</button>
+        <button id="btn-confirm-scan" type="button" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-slate-950 text-xs font-extrabold transition">Confirm &amp; Advance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-auto max-w-md text-center bg-teal-500 text-slate-950 text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-2xl"></div>
+
+  <script>
+    const STAGES = ['Pending Scan', 'Received', 'Washing', 'Steam Press', 'Ready Pickup', 'Collected'];
+    const STORAGE_KEY = 'washpulse_v3_state';
+    const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('washpulse_sync_v3') : null;
+
+    // Optional backend SMS gateway URL (set to your Twilio/MSG91/Firebase endpoint in production)
+    const SMS_API_ENDPOINT = '';
+
+    const catalog = [
+      { id: 'shirts', label: 'Shirts', risk: 'safe' },
+      { id: 'tshirts', label: 'T-Shirts', risk: 'safe' },
+      { id: 'jeans', label: 'Jeans', risk: 'safe' },
+      { id: 'trousers', label: 'Trousers / Pants', risk: 'safe' },
+      { id: 'shorts', label: 'Shorts / Trackpants', risk: 'safe' },
+      { id: 'kurtas', label: 'Kurtas / Ethnic Wear', risk: 'safe' },
+      { id: 'hoodies', label: 'Hoodies / Sweaters', risk: 'safe' },
+      { id: 'towels', label: 'Bath Towels', risk: 'safe' },
+      { id: 'sheet', label: 'Bedsheets / Covers', risk: 'safe' },
+      { id: 'jackets', label: 'Jackets', risk: 'safe' },
+    ];
+
+    const itemCounts = {
+      shirts: 0, tshirts: 0, jeans: 0, trousers: 0, shorts: 0,
+      kurtas: 0, hoodies: 0, towels: 0, sheet: 0, jackets: 0
+    };
+    const itemDelicate = {
+      shirts: false, tshirts: false, jeans: false, trousers: false, shorts: false,
+      kurtas: false, hoodies: false, towels: false, sheet: false, jackets: false
+    };
+
+    let state = {
+      students: [],
+      bags: [],
+      activeStudentId: null,
+      staffSession: null,
+    };
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) state = JSON.parse(saved);
+    } catch (e) {}
+
+    let pendingStudentDraft = null;
+    let activeModalBagId = null;
+    let modalVerifiedCount = 0;
+
+    function persistAndBroadcast() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      if (bc) bc.postMessage(state);
+    }
+
+    if (bc) {
+      bc.onmessage = (ev) => {
+        if (ev.data) {
+          state = ev.data;
+          renderAll();
+        }
+      };
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 3000);
+    }
+
+    function generateUniqueQrSvg(seed) {
+      let hash = 2166136261;
+      for (let i = 0; i < seed.length; i++) {
+        hash ^= seed.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      let cells = '';
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          const inFinder = (r < 3 && c < 3) || (r < 3 && c > 5) || (r > 5 && c < 3);
+          if (inFinder) continue;
+          const bit = ((hash >> ((r * 9 + c) % 31)) ^ (r * 7 + c * 13)) & 1;
+          if (bit) {
+            cells += `<rect x="${2 + c * 2}" y="${2 + r * 2}" width="1.8" height="1.8" fill="#0F172A"/>`;
+          }
+        }
+      }
+      return `
+        <svg width="92" height="92" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1.5" y="1.5" width="5" height="5" rx="0.8" stroke="#0F172A" stroke-width="1.5"/>
+          <rect x="3" y="3" width="2" height="2" fill="#0F172A"/>
+          <rect x="15.5" y="1.5" width="5" height="5" rx="0.8" stroke="#0F172A" stroke-width="1.5"/>
+          <rect x="17" y="3" width="2" height="2" fill="#0F172A"/>
+          <rect x="1.5" y="15.5" width="5" height="5" rx="0.8" stroke="#0F172A" stroke-width="1.5"/>
+          <rect x="3" y="17" width="2" height="2" fill="#0F172A"/>
+          ${cells}
+        </svg>
+      `;
+    }
+
+    function setViewMode(mode) {
+      const container = document.getElementById('apps-container');
+      const sPanel = document.getElementById('panel-student');
+      const stPanel = document.getElementById('panel-staff');
+
+      document.querySelectorAll('.mode-btn').forEach((b) => {
+        const active = b.id === `mode-${mode}`;
+        b.className = 'mode-btn px-2 sm:px-3.5 py-2 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition text-center ' +
+          (active ? 'bg-teal-500 text-slate-950' : 'text-slate-400 hover:text-white');
+      });
+
+      if (mode === 'split') {
+        container.className = 'grid grid-cols-1 lg:grid-cols-2 gap-6 items-start';
+        sPanel.classList.remove('hidden');
+        stPanel.classList.remove('hidden');
+      } else if (mode === 'student') {
+        container.className = 'max-w-xl mx-auto';
+        sPanel.classList.remove('hidden');
+        stPanel.classList.add('hidden');
+      } else {
+        container.className = 'max-w-xl mx-auto';
+        sPanel.classList.add('hidden');
+        stPanel.classList.remove('hidden');
+      }
+    }
+
+    function renderStudentApp() {
+      const currentStudent = state.students.find((s) => s.regId === state.activeStudentId) || null;
+      const authView = document.getElementById('student-auth-view');
+      const dashView = document.getElementById('student-dash-view');
+      const logoutBtn = document.getElementById('btn-student-logout');
+      const roomBadge = document.getElementById('student-room-badge');
+      const titleEl = document.getElementById('student-header-title');
+
+      if (!currentStudent) {
+        authView.classList.remove('hidden');
+        dashView.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+        roomBadge.classList.add('hidden');
+        titleEl.textContent = 'Verify Your Student Pass';
+
+        const savedWrap = document.getElementById('saved-students-wrap');
+        const savedList = document.getElementById('saved-students-list');
+        if (state.students.length > 0) {
+          savedWrap.classList.remove('hidden');
+          savedList.innerHTML = state.students.map((s) => `
+            <button data-switch-student="${s.regId}" type="button" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-teal-500/20 border border-slate-700 text-xs font-semibold text-white transition">
+              ${s.name} (${s.regId} · ${s.hostel})
+            </button>
+          `).join('');
+        } else {
+          savedWrap.classList.add('hidden');
+        }
+        return;
+      }
+
+      authView.classList.add('hidden');
+      dashView.classList.remove('hidden');
+      logoutBtn.classList.remove('hidden');
+      roomBadge.classList.remove('hidden');
+      roomBadge.textContent = `${currentStudent.hostel} · ${currentStudent.room}`;
+      titleEl.textContent = 'My Hostel Laundry Pass';
+
+      document.getElementById('dash-student-name').textContent = currentStudent.name;
+      document.getElementById('dash-student-meta').textContent = `ID: ${currentStudent.regId} · +91 ${currentStudent.phone} · ${currentStudent.hostel} Room ${currentStudent.room}`;
+      document.getElementById('student-qr-container').innerHTML = generateUniqueQrSvg(`${currentStudent.regId}|${currentStudent.phone}|${currentStudent.hostel}`);
+
+      const myBags = state.bags.filter((b) => b.regId === currentStudent.regId);
+      const totalUsed = myBags.reduce((sum, b) => sum + b.itemsCount, 0);
+      const pct = Math.min(100, Math.round((totalUsed / 24) * 100));
+      document.getElementById('quota-text').textContent = `${totalUsed} / 24 clothes`;
+      document.getElementById('quota-bar').style.width = `${pct}%`;
+
+      const latestBag = myBags[0];
+      const tl = document.getElementById('student-timeline');
+      const displayStages = ['Scanned', 'Washing', 'Steam Press', 'Ready', 'Collected'];
+
+      if (!latestBag) {
+        document.getElementById('student-bag-id').textContent = 'No Active Bag Yet';
+        document.getElementById('student-slot-label').textContent = 'Add clothes below to create a QR bag token.';
+        document.getElementById('student-status-pill').textContent = 'Idle';
+        tl.innerHTML = '';
+      } else {
+        document.getElementById('student-bag-id').textContent = `Live Bag · ${latestBag.id}`;
+        document.getElementById('student-slot-label').textContent = `Slot: ${latestBag.slot} (${latestBag.itemsCount} items)`;
+        document.getElementById('student-status-pill').textContent = STAGES[latestBag.stageIdx];
+        tl.innerHTML = displayStages.map((label, idx) => {
+          const stepStage = idx + 1;
+          const done = latestBag.stageIdx >= stepStage;
+          const current = latestBag.stageIdx === stepStage;
+          return `
+            <div class="flex flex-col items-center">
+              <div class="w-full h-1.5 rounded-full ${done ? 'bg-teal-400' : 'bg-slate-800'} mb-1.5"></div>
+              <span class="text-[10px] font-semibold ${current ? 'text-teal-300 font-bold' : (done ? 'text-slate-300' : 'text-slate-500')}">${label}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Variable +/- Bag Builder with Per-Item Delicate Toggle
+      let totalSelected = 0;
+      const delicateItems = [];
+      document.getElementById('bag-builder-items').innerHTML = catalog.map((item) => {
+        const qty = itemCounts[item.id] || 0;
+        const isDel = !!itemDelicate[item.id];
+        totalSelected += qty;
+        if (qty > 0 && isDel) delicateItems.push(`${qty}x ${item.label}`);
+        return `
+          <div class="p-2.5 rounded-xl border flex items-center justify-between gap-2 transition ${qty > 0 ? 'bg-teal-500/10 border-teal-500/40' : 'bg-slate-900 border-slate-800'}">
+            <div class="min-w-0">
+              <p class="text-xs font-bold text-white truncate">${item.label}</p>
+              <button data-delicate-toggle="${item.id}" type="button" class="mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold border transition ${isDel ? 'bg-amber-500 text-slate-950 border-amber-400' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'}">
+                ${isDel ? 'Delicate ✓' : 'Delicate'}
+              </button>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button data-qty-minus="${item.id}" type="button" class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-sm sm:text-xs font-bold">-</button>
+              <span class="w-5 text-center text-xs font-extrabold ${qty > 0 ? 'text-teal-300' : 'text-slate-400'}">${qty}</span>
+              <button data-qty-plus="${item.id}" type="button" class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-slate-800 hover:bg-teal-500 hover:text-slate-950 text-white text-sm sm:text-xs font-bold">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('bag-total-count').textContent = `${totalSelected} clothes selected`;
+
+      const alertBox = document.getElementById('ai-care-alert');
+      if (totalSelected === 0) {
+        alertBox.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400';
+        alertBox.textContent = 'Use + / - to add clothes and tap Delicate on any item needing gentle wash.';
+      } else if (delicateItems.length > 0) {
+        alertBox.className = 'p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200';
+        alertBox.innerHTML = `<strong>AI Care Guard:</strong> Delicate wash tagged for <em>${delicateItems.join(', ')}</em>—staff scanner will be alerted.`;
+      } else {
+        alertBox.className = 'p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-200';
+        alertBox.innerHTML = '<strong>AI Care Guard:</strong> Safe for standard hostel wash &amp; steam press.';
+      }
+    }
+
+    function renderStaffApp() {
+      const authView = document.getElementById('staff-auth-view');
+      const dashView = document.getElementById('staff-dash-view');
+      const badge = document.getElementById('staff-counter-badge');
+      const lockBtn = document.getElementById('btn-staff-logout');
+      const titleEl = document.getElementById('staff-header-title');
+
+      if (!state.staffSession) {
+        authView.classList.remove('hidden');
+        dashView.classList.add('hidden');
+        badge.classList.add('hidden');
+        lockBtn.classList.add('hidden');
+        titleEl.textContent = 'Staff Counter Sign-In';
+        return;
+      }
+
+      authView.classList.add('hidden');
+      dashView.classList.remove('hidden');
+      badge.classList.remove('hidden');
+      lockBtn.classList.remove('hidden');
+      badge.textContent = state.staffSession.counter;
+      titleEl.textContent = `StaffScan · ${state.staffSession.name}`;
+
+      const staffHostel = state.staffSession.counter.trim().toLowerCase();
+      const hostelBags = state.bags.filter((b) => {
+        const bh = (b.hostel || '').trim().toLowerCase();
+        return bh === staffHostel || staffHostel.includes(bh) || bh.includes(staffHostel);
+      });
+
+      document.getElementById('staff-queue-count').textContent = `${hostelBags.length} ${state.staffSession.counter} bags`;
+      const list = document.getElementById('staff-bag-list');
+
+      if (hostelBags.length === 0) {
+        list.innerHTML = `
+          <div class="rounded-2xl bg-slate-950 border border-slate-800 p-5 text-center">
+            <p class="text-xs font-semibold text-slate-300">No bags for ${state.staffSession.counter} yet.</p>
+            <p class="text-[11px] text-slate-500 mt-1">Only bags from ${state.staffSession.counter} students appear here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = hostelBags.map((b) => {
+        const nextIdx = Math.min(STAGES.length - 1, b.stageIdx + 1);
+        const isDone = b.stageIdx >= STAGES.length - 1;
+        const btnLabel = b.stageIdx === 0
+          ? 'Scan QR & Receive'
+          : (isDone ? 'Handover Complete ✓' : `Move to ${STAGES[nextIdx]}`);
+
+        return `
+          <div class="rounded-2xl bg-slate-950 border border-slate-800 p-4 space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-extrabold text-white">${b.id}</span>
+                <span class="ml-2 text-[11px] text-slate-400">${b.studentName} (${b.regId}) · ${b.hostel} ${b.room}</span>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${isDone ? 'bg-emerald-500/15 text-emerald-300' : 'bg-orange-500/15 text-orange-300'}">
+                ${STAGES[b.stageIdx]}
+              </span>
+            </div>
+            <p class="text-xs text-slate-300">${b.itemsCount} clothes · <span class="text-slate-400">${b.itemsLabel}</span></p>
+            ${b.careAlert ? `<p class="text-[11px] text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg inline-block">⚠ ${b.careAlert}</p>` : ''}
+            <div class="pt-1 flex justify-end">
+              <button data-advance="${b.id}" type="button" ${isDone ? 'disabled' : ''} class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${isDone ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-orange-500 hover:text-slate-950 text-white'}">
+                ${btnLabel}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openScanModal(bag) {
+      activeModalBagId = bag.id;
+      modalVerifiedCount = bag.itemsCount;
+      document.getElementById('modal-bag-badge').textContent = bag.id;
+      document.getElementById('modal-student-info').textContent = `${bag.studentName} (${bag.regId}) · ${bag.hostel} Room ${bag.room}`;
+      document.getElementById('modal-declared-count').textContent = `${bag.itemsCount} items`;
+      document.getElementById('modal-verified-count').textContent = String(modalVerifiedCount);
+      const note = document.getElementById('modal-care-note');
+      if (bag.careAlert) {
+        note.textContent = `Care Alert: ${bag.careAlert}`;
+        note.classList.remove('hidden');
+      } else {
+        note.classList.add('hidden');
+      }
+      document.getElementById('modal-staff-scan').classList.remove('hidden');
+    }
+
+    function renderAll() {
+      renderStudentApp();
+      renderStaffApp();
+    }
+
+    // --- EVENTS ---
+    document.getElementById('mode-student').addEventListener('click', () => setViewMode('student'));
+    document.getElementById('mode-staff').addEventListener('click', () => setViewMode('staff'));
+    document.getElementById('mode-split').addEventListener('click', () => setViewMode('split'));
+
+    // Enforce digits-only 10-digit mobile number
+    document.getElementById('inp-contact').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    });
+
+    document.getElementById('student-onboard-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('inp-name').value.trim();
+      const regId = document.getElementById('inp-regid').value.trim();
+      const hostel = document.getElementById('inp-hostel').value.trim();
+      const room = document.getElementById('inp-room').value.trim();
+      const phone = document.getElementById('inp-contact').value.replace(/\D/g, '');
+
+      if (phone.length !== 10) {
+        showToast('Please enter an exact 10-digit mobile number.');
+        return;
+      }
+
+      pendingStudentDraft = { name, regId, hostel, room, phone, verified: true };
+
+      if (SMS_API_ENDPOINT) {
+        try {
+          await fetch(SMS_API_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: `+91${phone}`, regId }),
+          });
+        } catch (err) {
+          showToast('Could not reach SMS gateway endpoint.');
+          return;
+        }
+      }
+
+      document.getElementById('otp-sent-status').textContent = `OTP dispatched to +91 ${phone}. Enter the 4-digit code received via SMS:`;
+      document.getElementById('otp-verify-box').classList.remove('hidden');
+      showToast(`OTP request sent for +91 ${phone}`);
+    });
+
+    document.getElementById('btn-verify-otp').addEventListener('click', () => {
+      const entered = document.getElementById('inp-otp').value.replace(/\D/g, '');
+      if (!pendingStudentDraft) return;
+      if (entered.length !== 4) {
+        showToast('Enter a valid 4-digit OTP.');
+        return;
+      }
+      const existingIdx = state.students.findIndex((s) => s.regId === pendingStudentDraft.regId);
+      if (existingIdx >= 0) state.students[existingIdx] = pendingStudentDraft;
+      else state.students.unshift(pendingStudentDraft);
+
+      state.activeStudentId = pendingStudentDraft.regId;
+      pendingStudentDraft = null;
+      document.getElementById('student-onboard-form').reset();
+      document.getElementById('inp-otp').value = '';
+      document.getElementById('otp-verify-box').classList.add('hidden');
+      persistAndBroadcast();
+      renderAll();
+      showToast('Mobile verified! Unique QR Pass generated.');
+    });
+
+    document.getElementById('saved-students-list').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-switch-student]');
+      if (!btn) return;
+      state.activeStudentId = btn.dataset.switchStudent;
+      persistAndBroadcast();
+      renderAll();
+    });
+
+    document.getElementById('btn-student-logout').addEventListener('click', () => {
+      state.activeStudentId = null;
+      Object.keys(itemCounts).forEach((k) => { itemCounts[k] = 0; itemDelicate[k] = false; });
+      persistAndBroadcast();
+      renderAll();
+    });
+
+    // Variable +/- quantity and per-item Delicate toggle handlers
+    document.getElementById('bag-builder-items').addEventListener('click', (e) => {
+      const delBtn = e.target.closest('button[data-delicate-toggle]');
+      const plusBtn = e.target.closest('button[data-qty-plus]');
+      const minusBtn = e.target.closest('button[data-qty-minus]');
+      if (delBtn) {
+        const id = delBtn.dataset.delicateToggle;
+        itemDelicate[id] = !itemDelicate[id];
+        renderStudentApp();
+      } else if (plusBtn) {
+        const id = plusBtn.dataset.qtyPlus;
+        itemCounts[id] = Math.min(20, (itemCounts[id] || 0) + 1);
+        renderStudentApp();
+      } else if (minusBtn) {
+        const id = minusBtn.dataset.qtyMinus;
+        itemCounts[id] = Math.max(0, (itemCounts[id] || 0) - 1);
+        renderStudentApp();
+      }
+    });
+
+    document.getElementById('btn-submit-bag').addEventListener('click', () => {
+      const student = state.students.find((s) => s.regId === state.activeStudentId);
+      if (!student) return;
+      const picked = catalog.filter((c) => (itemCounts[c.id] || 0) > 0);
+      if (picked.length === 0) {
+        showToast('Use + to add at least one clothing item.');
+        return;
+      }
+      const totalClothes = picked.reduce((sum, item) => sum + itemCounts[item.id], 0);
+      const bagId = 'BAG-' + Math.floor(100 + Math.random() * 899);
+      const delList = picked.filter((c) => itemDelicate[c.id]).map((c) => `${itemCounts[c.id]}x ${c.label}`);
+      const slot = document.getElementById('slot-select').value;
+
+      state.bags.unshift({
+        id: bagId,
+        regId: student.regId,
+        studentName: student.name,
+        hostel: student.hostel,
+        room: student.room,
+        slot,
+        itemsCount: totalClothes,
+        itemsLabel: picked.map((p) => `${itemCounts[p.id]}x ${p.label}${itemDelicate[p.id] ? ' (Delicate)' : ''}`).join(', '),
+        careAlert: delList.length > 0 ? `Delicate Wash: ${delList.join(', ')}` : '',
+        stageIdx: 0,
+      });
+      Object.keys(itemCounts).forEach((k) => { itemCounts[k] = 0; itemDelicate[k] = false; });
+      persistAndBroadcast();
+      renderAll();
+      showToast(`${bagId} created (${totalClothes} clothes)!`);
+    });
+
+    document.getElementById('staff-login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('staff-name-inp').value.trim();
+      const counter = document.getElementById('staff-counter-inp').value.trim();
+      const pin = document.getElementById('staff-pin-inp').value.trim();
+      if (!name || !counter || pin.length < 4) {
+        showToast('Enter attendant name, counter, and a 4-digit PIN.');
+        return;
+      }
+      state.staffSession = { name, counter };
+      document.getElementById('staff-pin-inp').value = '';
+      persistAndBroadcast();
+      renderStaffApp();
+      showToast(`Staff scanner unlocked for ${counter}`);
+    });
+
+    document.getElementById('btn-staff-logout').addEventListener('click', () => {
+      state.staffSession = null;
+      persistAndBroadcast();
+      renderStaffApp();
+    });
+
+    document.getElementById('btn-staff-lookup-scan').addEventListener('click', () => {
+      const q = document.getElementById('staff-scan-input').value.trim().toLowerCase();
+      if (!q) {
+        showToast('Enter a Student ID or Bag ID to scan.');
+        return;
+      }
+      const match = state.bags.find((b) => b.id.toLowerCase() === q || b.regId.toLowerCase() === q);
+      if (!match) {
+        showToast('No matching active bag found for that ID.');
+        return;
+      }
+      if (state.staffSession) {
+        const sh = state.staffSession.counter.trim().toLowerCase();
+        const bh = (match.hostel || '').trim().toLowerCase();
+        if (!(bh === sh || sh.includes(bh) || bh.includes(sh))) {
+          showToast(`Access denied: ${match.id} belongs to ${match.hostel}, not ${state.staffSession.counter}.`);
+          return;
+        }
+      }
+      openScanModal(match);
+    });
+
+    document.getElementById('staff-bag-list').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-advance]');
+      if (!btn) return;
+      const bag = state.bags.find((b) => b.id === btn.dataset.advance);
+      if (!bag) return;
+      if (bag.stageIdx === 0) {
+        openScanModal(bag);
+      } else {
+        bag.stageIdx = Math.min(STAGES.length - 1, bag.stageIdx + 1);
+        persistAndBroadcast();
+        renderAll();
+        showToast(`${bag.id} -> ${STAGES[bag.stageIdx]} (Synced to ${bag.studentName})`);
+      }
+    });
+
+    document.getElementById('btn-count-minus').addEventListener('click', () => {
+      modalVerifiedCount = Math.max(1, modalVerifiedCount - 1);
+      document.getElementById('modal-verified-count').textContent = String(modalVerifiedCount);
+    });
+
+    document.getElementById('btn-count-plus').addEventListener('click', () => {
+      modalVerifiedCount += 1;
+      document.getElementById('modal-verified-count').textContent = String(modalVerifiedCount);
+    });
+
+    document.getElementById('btn-close-scan').addEventListener('click', () => {
+      document.getElementById('modal-staff-scan').classList.add('hidden');
+    });
+
+    document.getElementById('btn-confirm-scan').addEventListener('click', () => {
+      const bag = state.bags.find((b) => b.id === activeModalBagId);
+      if (bag) {
+        bag.itemsCount = modalVerifiedCount;
+        bag.stageIdx = Math.min(STAGES.length - 1, bag.stageIdx + 1);
+      }
+      document.getElementById('modal-staff-scan').classList.add('hidden');
+      persistAndBroadcast();
+      renderAll();
+      showToast(`QR Verified! ${bag.id} is now "${STAGES[bag.stageIdx]}".`);
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
