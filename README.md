@@ -2,8 +2,10 @@
 
 Static student/staff laundry demo prepared for Netlify hosting.
 
-- Open `index.html` locally to preview the demo.
-- See `DEPLOY_GUIDE.md` for Netlify deployment instructions.
-- GitHub Actions deploys every push to `main` after repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` are configured.
+## Deploy
+
+Import this GitHub repository into Netlify as an existing project. The root `netlify.toml` sets the publish directory to `.` and leaves the build command empty. Netlify then automatically deploys each push to the connected production branch.
+
+See `DEPLOY_GUIDE.md` for the exact setup steps.
 
 This is a front-end demo only. Review the limitations in `DEPLOY_GUIDE.md` before using it with real student records.
